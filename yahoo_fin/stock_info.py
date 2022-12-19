@@ -5,6 +5,7 @@ import io
 import re
 import json
 import datetime
+import numpy as np 
 
 try:
     from requests_html import HTMLSession
@@ -52,16 +53,20 @@ def force_float(elt):
     
 def _convert_to_numeric(s):
 
-    if "M" in s:
-        s = s.strip("M")
-        return force_float(s) * 1_000_000
-    
-    if "B" in s:
-        s = s.strip("B")
-        return force_float(s) * 1_000_000_000
-    
-    return force_float(s)
+    if isinstance(s, str): #enforcing s being a string
+        if "M" in s:
+            s = s.strip("M")
+            out = force_float(s) * 1_000_000
+        
+        elif "B" in s:
+            s = s.strip("B")
+            out = force_float(s) * 1_000_000_000
 
+        else: #must not contain M or B
+            out = force_float(s)
+    else: 
+        out = np.nan
+    return out
 
 def get_data(ticker, start_date = None, end_date = None, index_as_date = True,
              interval = "1d", headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
